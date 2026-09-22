@@ -1,42 +1,371 @@
 [
   {
     "id": 1,
-    "title": "ZA ZA水",
+    "title": "Zam Zam水",
     "price": "￥240",
     "category": "沙特好物",
     "image": "",
-    "desc": "ZA ZA水，价格：￥240",
-    "options": []
+    "desc": "Zam Zam水",
+    "options": [
+      {
+        "name": "地区",
+        "values": [
+          {
+            "name": "内地",
+            "price": "240"
+          },
+          {
+            "name": "新疆",
+            "price": "260"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 2,
     "title": "黑籽蜂蜜",
     "price": "￥150",
-    "category": "默认分类",
-    "image": "https://via.placeholder.com/300x300?text=黑籽蜂蜜",
-    "desc": "黑籽蜂蜜，价格：￥150",
+    "category": "滋补保健",
+    "image": "",
+    "desc": "黑籽蜂蜜",
     "options": []
+  },
+  {
+    "id": 3,
+    "title": "黑籽油",
+    "price": "￥110",
+    "category": "滋补保健",
+    "image": "",
+    "desc": "黑籽油",
+    "options": []
+  },
+  {
+    "id": 4,
+    "title": "沙特绿色美肤膏",
+    "price": "￥65",
+    "category": "药物护理",
+    "image": "",
+    "desc": "沙特绿色美肤膏",
+    "options": []
+  },
+  {
+    "id": 5,
+    "title": "印度胃药",
+    "price": "￥215",
+    "category": "药物护理",
+    "image": "",
+    "desc": "印度胃药",
+    "options": []
+  },
+  {
+    "id": 6,
+    "title": "埃及老虎贴",
+    "price": "￥248",
+    "category": "药物护理",
+    "image": "",
+    "desc": "埃及老虎贴",
+    "options": []
+  },
+  {
+    "id": 7,
+    "title": "埃及鼻炎喷",
+    "price": "￥65",
+    "category": "药物护理",
+    "image": "",
+    "desc": "埃及鼻炎喷",
+    "options": []
+  },
+  {
+    "id": 8,
+    "title": "埃及美肤膏",
+    "price": "￥45",
+    "category": "药物护理",
+    "image": "",
+    "desc": "埃及美肤膏",
+    "options": []
+  },
+  {
+    "id": 9,
+    "title": "沙特Reef香水",
+    "price": "￥399",
+    "category": "香水香氛",
+    "image": "",
+    "desc": "沙特Reef香水",
+    "options": [
+      {
+        "name": "香型",
+        "values": [
+          {
+            "name": "33号",
+            "price": "399"
+          },
+          {
+            "name": "15号",
+            "price": "399"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 10,
-    "title": "小精油香水（3瓶）",
+    "title": "沙特香薰",
+    "price": "￥150",
+    "category": "香水香氛",
+    "image": "",
+    "desc": "沙特香薰，三种味道可选",
+    "options": [
+      {
+        "name": "香型",
+        "values": [
+          "黑色黑石 麝香+沉香",
+          "棕色 沉香+欧德香",
+          "绿色 麦迪娜天堂花园"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "小精油香水",
     "price": "￥100",
-    "category": "香水/精油",
+    "category": "香水香氛",
     "image": "https://via.placeholder.com/300x300?text=小精油香水",
-    "desc": "小精油香水（3瓶），价格：￥100",
+    "desc": "小精油香水，多规格可选",
+    "options": [
+      {
+        "name": "规格",
+        "values": [
+          {
+            "name": "3瓶装",
+            "price": "100"
+          },
+          {
+            "name": "5瓶装",
+            "price": "150"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "印度脚气膏",
+    "price": "￥50",
+    "category": "药物护理",
+    "image": "",
+    "desc": "印度脚气膏",
     "options": []
   },
   {
-    "id": 25,
-    "title": "开心果巧克力（无糖、有糖）",
+    "id": 13,
+    "title": "埃及痔疮膏",
+    "price": "￥50",
+    "category": "药物护理",
+    "image": "",
+    "desc": "埃及痔疮膏",
+    "options": []
+  },
+  {
+    "id": 14,
+    "title": "护肤玫瑰精油",
+    "price": "￥120",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "护肤玫瑰精油",
+    "options": []
+  },
+  {
+    "id": 15,
+    "title": "葡萄籽精油",
+    "price": "￥99",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "葡萄籽精油",
+    "options": []
+  },
+  {
+    "id": 16,
+    "title": "玫瑰纯露",
+    "price": "￥108",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "玫瑰纯露",
+    "options": []
+  },
+  {
+    "id": 17,
+    "title": "玫瑰冷霜",
+    "price": "￥130",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "玫瑰冷霜",
+    "options": []
+  },
+  {
+    "id": 18,
+    "title": "抗皱冷霜",
+    "price": "￥145",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "抗皱冷霜",
+    "options": []
+  },
+  {
+    "id": 19,
+    "title": "椰枣巧克力",
+    "price": "￥78",
+    "category": "休闲零食",
+    "image": "",
+    "desc": "椰枣巧克力",
+    "options": []
+  },
+  {
+    "id": 20,
+    "title": "三种椰枣（每公斤）",
+    "price": "￥95",
+    "category": "休闲零食",
+    "image": "",
+    "desc": "三种椰枣（每公斤）",
+    "options": []
+  },
+  {
+    "id": 21,
+    "title": "沙特保湿霜/沙特霜",
+    "price": "￥55",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "沙特保湿霜/沙特霜，多规格组合优惠",
+    "options": [
+      {
+        "name": "规格",
+        "values": [
+          {
+            "name": "沙特保湿霜200克 (1个)",
+            "price": "55"
+          },
+          {
+            "name": "沙特霜 (2个装)",
+            "price": "100"
+          },
+          {
+            "name": "沙特霜 (5个装)",
+            "price": "230"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "title": "香体膏（30g左右）",
+    "price": "￥95",
+    "category": "香水香氛",
+    "image": "",
+    "desc": "香体膏30g左右",
+    "options": [
+      {
+        "name": "香型",
+        "values": [
+          "玫瑰",
+          "海洋",
+          "白麝香",
+          "沉香"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "title": "开心果巧克力",
     "price": "￥68",
-    "category": "零食/食品",
-    "image": "https://via.placeholder.com/300x300?text=开心果巧克力",
-    "desc": "开心果巧克力（无糖、有糖），价格：￥68",
+    "category": "休闲零食",
+    "image": "",
+    "desc": "开心果巧克力，口味可选",
     "options": [
       {
         "name": "口味",
-        "values": ["无糖", "有糖"]
+        "values": [
+          "无糖",
+          "有糖"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Patchi 巧克力",
+    "price": "￥300",
+    "category": "休闲零食",
+    "image": "",
+    "desc": "Patchi 巧克力系列",
+    "options": [
+      {
+        "name": "包装规格",
+        "values": [
+          {
+            "name": "纸盒装 500g",
+            "price": "300"
+          },
+          {
+            "name": "铁盒装 500g",
+            "price": "320"
+          },
+          {
+            "name": "预定1公斤混合装",
+            "price": "565"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "title": "普通巧克力 500g",
+    "price": "￥150",
+    "category": "休闲零食",
+    "image": "",
+    "desc": "普通巧克力 500g",
+    "options": []
+  },
+  {
+    "id": 26,
+    "title": "羊奶皂 / 橄榄油皂",
+    "price": "￥65",
+    "category": "护肤美妆",
+    "image": "",
+    "desc": "清洁香皂",
+    "options": [
+      {
+        "name": "款式",
+        "values": [
+          "羊奶皂",
+          "橄榄油皂"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "title": "Reef Mini 香水（15ml）",
+    "price": "￥100",
+    "category": "香水香氛",
+    "image": "",
+    "desc": "reefmini 15ml 小瓶香水",
+    "options": [
+      {
+        "name": "香型",
+        "values": [
+          {
+            "name": "33号",
+            "price": "100"
+          },
+          {
+            "name": "15号",
+            "price": "100"
+          }
+        ]
       }
     ]
   }
