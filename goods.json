@@ -1,34 +1,43 @@
 [
-{
-"id": 1,
-"title": "补水保湿面膜 (10片/盒)",
-"price": "99.00",
-"category": "护肤品",
-"image": "https://via.placeholder.com/400x400/fee2e2/dc2626?text=Mask",
-"desc": "【热销爆款】深层补水，舒缓修护，适合所有肌肤使用。\n\n规格：10片/盒\n保质期：3年\n使用方法：洁面后敷15-20分钟即可。"
-},
-{
-"id": 2,
-"title": "法国进口植物精油 30ml",
-"price": "188.00",
-"category": "护肤品",
-"image": "https://via.placeholder.com/400x400/fef3c7/d97706?text=Essential+Oil",
-"desc": "【纯天然萃取】改善干燥，提亮肤色，夜间修护首选。\n\n滴取3-4滴于掌心搓热后轻压于面部。"
-},
-{
-"id": 3,
-"title": "手工特级黑乌龙茶 (250g)",
-"price": "128.00",
-"category": "美食茶叶",
-"image": "https://via.placeholder.com/400x400/dcfce7/15803d?text=Tea",
-"desc": "【原产地直供】浓郁回甘，解油腻，独立小包装，携带方便。\n\n净含量：250g\n储存方法：密封置于阴凉干燥处。"
-},
-{
-"id": 4,
-"title": "纯棉舒适短袖T恤",
-"price": "79.00",
-"category": "女装男装",
-"image": "https://via.placeholder.com/400x400/e0e7ff/4338ca?text=T-Shirt",
-"desc": "【100%重磅纯棉】透气亲肤，不易变形，多色可选。\n\n尺码：M / L / XL / XXL\n颜色：白色 / 黑色 / 雾霾蓝"
-}
+  {
+    "id": 1,
+    "title": "ZA ZA水",
+    "price": "￥240",
+    "category": "沙特好物",
+    "image": "",
+    "desc": "ZA ZA水，价格：￥240",
+    "options": []
+  },
+  {
+    "id": 2,
+    "title": "黑籽蜂蜜",
+    "price": "￥150",
+    "category": "默认分类",
+    "image": "https://via.placeholder.com/300x300?text=黑籽蜂蜜",
+    "desc": "黑籽蜂蜜，价格：￥150",
+    "options": []
+  },
+  {
+    "id": 10,
+    "title": "小精油香水（3瓶）",
+    "price": "￥100",
+    "category": "香水/精油",
+    "image": "https://via.placeholder.com/300x300?text=小精油香水",
+    "desc": "小精油香水（3瓶），价格：￥100",
+    "options": []
+  },
+  {
+    "id": 25,
+    "title": "开心果巧克力（无糖、有糖）",
+    "price": "￥68",
+    "category": "零食/食品",
+    "image": "https://via.placeholder.com/300x300?text=开心果巧克力",
+    "desc": "开心果巧克力（无糖、有糖），价格：￥68",
+    "options": [
+      {
+        "name": "口味",
+        "values": ["无糖", "有糖"]
+      }
+    ]
+  }
 ]
