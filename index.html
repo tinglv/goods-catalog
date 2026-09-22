@@ -1,611 +1,333 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>店主精选 - 商品目录</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#fef2f2',
-                            100: '#ffe1e1',
-                            500: '#ef4444',
-                            600: '#dc2626',
-                            700: '#b91c1c',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* 规格选中动画 */
-        .chip-option {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .chip-option.active {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-            color: #dc2626;
-            font-weight: 600;
-            box-shadow: 0 0 0 1px #ef4444, 0 2px 4px rgba(239, 68, 68, 0.15);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>微商商品展示商城</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f6f6f6; color: #333; padding-bottom: 80px; }
+    
+    header { background: #07c160; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    header h1 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .search-box { width: 100%; max-width: 500px; padding: 8px 14px; border: none; border-radius: 20px; font-size: 14px; outline: none; }
 
-        /* 底部弹窗动画 */
-        .modal-sheet {
-            transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1);
-        }
-    </style>
+    .category-bar { display: flex; overflow-x: auto; background: white; padding: 10px; gap: 8px; border-bottom: 1px solid #eee; position: sticky; top: 73px; z-index: 99; }
+    .category-item { padding: 5px 12px; background: #f0f0f0; border-radius: 14px; font-size: 13px; color: #666; white-space: nowrap; cursor: pointer; }
+    .category-item.active { background: #07c160; color: white; font-weight: bold; }
+
+    .goods-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; max-width: 800px; margin: 0 auto; }
+    .goods-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; }
+    .goods-img { width: 100%; height: 150px; object-fit: cover; }
+    .goods-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .goods-title { font-size: 14px; font-weight: bold; line-height: 1.3; margin-bottom: 6px; color: #222; }
+    .goods-price { color: #fa5151; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+
+    /* 直接展示在卡片上的规格区域 */
+    .card-spec-section { margin-bottom: 10px; background: #fafafa; padding: 6px; border-radius: 6px; }
+    .card-spec-group { margin-bottom: 6px; }
+    .card-spec-group:last-child { margin-bottom: 0; }
+    .card-spec-title { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .card-spec-items { display: flex; flex-wrap: wrap; gap: 4px; }
+    .card-spec-btn { padding: 3px 8px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 11px; background: white; color: #444; cursor: pointer; }
+    .card-spec-btn.selected { border-color: #07c160; color: #07c160; background: #f0f9f4; font-weight: bold; }
+
+    .card-actions { display: flex; gap: 6px; }
+    .btn-cart { flex: 1; background: #e8f7ee; color: #07c160; border: none; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .btn-buy { flex: 1; background: #07c160; color: white; border: none; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+    /* 悬浮购物车按钮 */
+    .cart-float-btn { position: fixed; right: 20px; bottom: 20px; background: #ff5000; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(255,80,0,0.4); cursor: pointer; z-index: 1000; }
+    .cart-float-btn .icon { font-size: 20px; line-height: 1; }
+    .cart-float-btn .text { font-size: 10px; margin-top: 2px; }
+    .cart-badge { position: absolute; top: -2px; right: -2px; background: #fa5151; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold; border: 2px solid white; }
+
+    /* 弹窗通用样式 */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 1001; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 16px 16px 0 0; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .close-btn { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #999; cursor: pointer; line-height: 1; }
+
+    /* 购物车弹窗 */
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .cart-item-title { font-size: 14px; font-weight: bold; }
+    .cart-item-spec { font-size: 12px; color: #888; margin-top: 2px; }
+    .cart-item-price { color: #fa5151; font-size: 14px; font-weight: bold; margin-top: 2px; }
+    .cart-item-control { display: flex; align-items: center; gap: 8px; }
+    .btn-qty { width: 26px; height: 26px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+    .btn-submit-order { width: 100%; background: #07c160; color: white; border: none; padding: 12px 0; border-radius: 25px; font-size: 15px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+
+    /* 二维码弹窗 */
+    .qr-box { text-align: center; padding: 10px 0; }
+    .qr-img { width: 200px; height: 200px; margin: 10px auto; display: block; border: 1px solid #eee; }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased font-sans pb-24 select-none">
+<body>
 
-    <!-- 顶部导航 -->
-    <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
-        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-600 to-rose-400 text-white flex items-center justify-center font-bold text-base shadow-md">
-                    店
-                </div>
-                <div>
-                    <h1 class="font-bold text-sm text-gray-900 leading-tight">店主精选选购页</h1>
-                    <p class="text-[11px] text-gray-400">挑选心仪商品 · 一键复制微信购买</p>
-                </div>
-            </div>
-            <button onclick="openContactModal()" class="bg-brand-50 text-brand-600 text-xs px-3 py-1.5 rounded-full font-medium border border-brand-100 active:scale-95 transition">
-                联系店主
-            </button>
-        </div>
+  <header>
+    <h1>微商商品展示目录</h1>
+    <input type="text" class="search-box" id="searchInput" placeholder="搜索商品..." oninput="filterGoods()">
+  </header>
 
-        <!-- 搜索与分类栏 -->
-        <div class="max-w-md mx-auto px-4 pb-2.5">
-            <div class="relative my-1.5">
-                <input type="text" id="searchInput" placeholder="搜索商品名称或关键词..." 
-                       class="w-full bg-gray-100 text-xs pl-8 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition">
-                <svg class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-            
-            <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1"></div>
-        </div>
-    </header>
+  <div class="category-bar" id="categoryBar">
+    <div class="category-item active" onclick="selectCategory('全部')">全部</div>
+  </div>
 
-    <!-- 主体：商品列表 -->
-    <main class="max-w-md mx-auto px-3 pt-3">
-        <div id="goodsGrid" class="grid grid-cols-2 gap-2.5"></div>
-        <div id="emptyState" class="hidden text-center py-16">
-            <div class="text-3xl mb-2">🔍</div>
-            <p class="text-gray-400 text-xs">没有找到相关商品哦</p>
-        </div>
-    </main>
+  <div class="goods-list" id="goodsList"></div>
 
-    <!-- 悬浮购物车按钮 -->
-    <div onclick="openCartModal()" class="fixed right-4 bottom-6 z-40 bg-gray-900 text-white rounded-full p-3 shadow-xl active:scale-90 transition-transform flex items-center justify-center cursor-pointer">
-        <div class="relative">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-            </svg>
-            <span id="cartBadge" class="absolute -top-2 -right-2 bg-brand-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-900">0</span>
-        </div>
+  <!-- 悬浮购物车 -->
+  <div class="cart-float-btn" onclick="openCartModal()">
+    <span class="icon">🛒</span>
+    <span class="text">购物车</span>
+    <span class="cart-badge" id="cartBadge">0</span>
+  </div>
+
+  <!-- 购物车弹窗 -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
+      <h3 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">已选商品清单</h3>
+      <div id="cartItemsList"></div>
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+        <span>合计预估：</span>
+        <span style="color: #fa5151; font-size: 18px; font-weight: bold;" id="cartTotalPrice">￥0</span>
+      </div>
+      <button class="btn-submit-order" onclick="submitCartOrder()">复制订单并联系店主购买</button>
     </div>
+  </div>
 
-    <!-- 升级版的商品规格选择/详情弹窗 -->
-    <div id="detailModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center sm:items-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[90vh] flex flex-col relative overflow-hidden modal-sheet">
-            
-            <!-- 关闭按钮 -->
-            <button onclick="closeDetailModal()" class="absolute right-3.5 top-3.5 z-20 bg-gray-100 hover:bg-gray-200 text-gray-500 w-7 h-7 rounded-full flex items-center justify-center text-sm transition">✕</button>
-
-            <!-- 弹窗可滚动主体 -->
-            <div class="overflow-y-auto p-4 space-y-4">
-                <!-- 商品头部信息：图片 + 价格标题 + 已选提示 -->
-                <div class="flex space-x-3.5 items-start">
-                    <img id="modalImage" src="" alt="" class="w-24 h-24 rounded-xl object-cover bg-gray-100 flex-shrink-0 border border-gray-100">
-                    <div class="flex-1 min-w-0 pt-0.5">
-                        <div class="flex items-baseline space-x-1.5">
-                            <span class="text-xs font-bold text-brand-600">￥</span>
-                            <span id="modalPrice" class="text-2xl font-black text-brand-600">--</span>
-                        </div>
-                        <h2 id="modalTitle" class="text-sm font-bold text-gray-900 line-clamp-2 mt-0.5">--</h2>
-                        <!-- 动态选中提示 -->
-                        <div id="selectedSpecSummary" class="mt-2 text-[11px] text-brand-600 bg-brand-50 px-2 py-1 rounded-md inline-block font-medium">
-                            已选：--
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-gray-100">
-
-                <!-- 规格选择区域 (Dynamic Spec Chips) -->
-                <div id="optionsContainer" class="space-y-4"></div>
-
-                <hr class="border-gray-100">
-
-                <!-- 数量选择器 -->
-                <div class="flex justify-between items-center py-1">
-                    <div>
-                        <span class="text-xs font-bold text-gray-800">购买数量</span>
-                        <p class="text-[10px] text-gray-400">单次购买份数</p>
-                    </div>
-                    <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
-                        <button onclick="changeModalQty(-1)" class="w-7 h-7 bg-white text-gray-700 rounded-md font-bold text-sm shadow-sm active:scale-95 transition flex items-center justify-center">-</button>
-                        <span id="modalQtyDisplay" class="w-8 text-center text-xs font-bold text-gray-800">1</span>
-                        <button onclick="changeModalQty(1)" class="w-7 h-7 bg-white text-gray-700 rounded-md font-bold text-sm shadow-sm active:scale-95 transition flex items-center justify-center">+</button>
-                    </div>
-                </div>
-
-                <!-- 商品文字介绍 -->
-                <div class="bg-gray-50 p-3 rounded-xl">
-                    <h3 class="text-[11px] font-bold text-gray-400 mb-1">商品详情说明</h3>
-                    <p id="modalDesc" class="text-xs text-gray-600 leading-relaxed whitespace-pre-line"></p>
-                </div>
-            </div>
-
-            <!-- 底部触控大按钮 (双按钮设计) -->
-            <div class="p-3 bg-white border-t border-gray-100 grid grid-cols-2 gap-2.5">
-                <button onclick="addModalItemToCart()" class="w-full bg-rose-50 hover:bg-rose-100 text-brand-600 font-bold py-3 rounded-xl text-xs active:scale-95 transition">
-                    加入购物车
-                </button>
-                <button onclick="buyNowFromModal()" class="w-full bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold py-3 rounded-xl text-xs shadow-md shadow-brand-500/20 active:scale-95 transition">
-                    立即购买
-                </button>
-            </div>
-        </div>
+  <!-- 微信客服/付款弹窗 -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('qrModal')">&times;</span>
+      <div class="qr-box">
+        <h3 style="color: #07c160; margin-bottom: 8px;">订单信息已复制！</h3>
+        <p style="font-size: 13px; color: #666;">请在微信中粘贴发送给店主，长按扫描二维码添加微信：</p>
+        <img id="ownerQr" class="qr-img" src="" alt="微信二维码">
+        <p style="font-size: 14px; font-weight: bold;">微信号：<span id="wechatIdText"></span></p>
+      </div>
     </div>
+  </div>
 
-    <!-- 购物车查看/结算弹窗 -->
-    <div id="cartModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center sm:items-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[85vh] flex flex-col relative modal-sheet">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <h3 class="text-sm font-bold text-gray-900">购物车</h3>
-                    <span id="cartCountTitle" class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">0 件商品</span>
-                </div>
-                <button onclick="clearCart()" class="text-xs text-gray-400 hover:text-red-500 transition">清空购物车</button>
-            </div>
+  <script>
+    const WECHAT_ID = "wx_shop_owner"; // 替换为你的真实微信号
+    const QR_CODE_URL = "https://via.placeholder.com/300x300?text=WeChat+QR"; // 替换为微信二维码图片链接
 
-            <!-- 购物车列表 -->
-            <div id="cartItemsContainer" class="p-4 overflow-y-auto flex-1 divide-y divide-gray-100"></div>
+    let allGoods = [];
+    let currentCategory = '全部';
+    let cardSelectedOptions = {}; // 记录每个卡片选中的规格 { goodId: { "规格名": "选项值" } }
+    let cart = [];
 
-            <!-- 购物车底部结算 -->
-            <div class="p-4 border-t border-gray-100 bg-white">
-                <div class="flex justify-between items-baseline mb-3">
-                    <span class="text-xs text-gray-500">预计合计金额</span>
-                    <div class="flex items-baseline space-x-0.5">
-                        <span class="text-xs font-bold text-brand-600">￥</span>
-                        <span id="cartTotalAmount" class="text-xl font-black text-brand-600">0.00</span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="closeCartModal()" class="bg-gray-100 text-gray-600 text-xs font-bold py-3 rounded-xl active:scale-95 transition">继续挑选</button>
-                    <button onclick="submitCartOrder()" class="bg-brand-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition">复制清单并购买</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 联系店主 / 引导微信转账弹窗 -->
-    <div id="contactModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-xs rounded-2xl p-5 text-center relative">
-            <button onclick="closeContactModal()" class="absolute right-3.5 top-3.5 text-gray-400 hover:text-gray-600">✕</button>
-            
-            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
-                ✓
-            </div>
-            <h3 class="text-base font-bold text-gray-900 mb-1">已复制订单信息</h3>
-            <p class="text-xs text-gray-500 mb-3">请打开微信，长按粘贴发送给店主下单付款</p>
-
-            <div class="w-44 h-44 mx-auto bg-gray-50 rounded-xl mb-3 overflow-hidden border border-gray-100 p-2 shadow-inner">
-                <img id="qrImage" src="" alt="店主二维码" class="w-full h-full object-cover rounded-lg">
-            </div>
-
-            <div class="bg-gray-50 p-2.5 rounded-xl mb-3 text-left text-xs text-gray-600 space-y-1">
-                <p><span class="text-gray-400">店主微信号：</span><span id="wechatIdText" class="font-bold text-gray-800">--</span></p>
-            </div>
-
-            <button onclick="copyWechatIdOnly()" class="w-full bg-gray-900 text-white text-xs font-medium py-2.5 rounded-xl hover:bg-black transition active:scale-95">
-                仅复制店主微信号
-            </button>
-        </div>
-    </div>
-
-    <!-- Toast 全局提示 -->
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900/90 backdrop-blur-sm text-white text-xs px-4 py-2.5 rounded-full z-50 hidden shadow-2xl transition-all"></div>
-
-    <script>
-        // ===========================
-        // 配置区域（填入真实微信信息）
-        // ===========================
-        const WECHAT_ID = "wx_shop_owner"; 
-        const QR_CODE_URL = "https://via.placeholder.com/300x300?text=WeChat+QR";
-
-        let allGoods = [];
-        let currentCategory = "全部";
-        let activeItem = null;
-        let selectedSpecs = {}; // { "颜色": "纯白色", "尺码": "M" }
-        let modalQuantity = 1;
-        let cart = []; // [{ id, item, specs, price, qty }]
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("wechatIdText").innerText = WECHAT_ID;
-            document.getElementById("qrImage").src = QR_CODE_URL;
-            fetchGoodsData();
-            document.getElementById("searchInput").addEventListener("input", filterGoods);
+    fetch('goods.json')
+      .then(res => res.json())
+      .then(data => {
+        allGoods = data;
+        // 初始化每个商品的默认规格
+        allGoods.forEach(good => {
+          cardSelectedOptions[good.id] = {};
+          if (good.options && good.options.length > 0) {
+            good.options.forEach(opt => {
+              const firstVal = typeof opt.values[0] === 'object' ? opt.values[0].name : opt.values[0];
+              cardSelectedOptions[good.id][opt.name] = firstVal;
+            });
+          }
         });
+        renderCategories();
+        renderGoods();
+      });
 
-        async function fetchGoodsData() {
-            try {
-                const res = await fetch('goods.json');
-                allGoods = await res.json();
-                renderCategories();
-                renderGoods(allGoods);
-            } catch (err) {
-                console.error("加载商品失败:", err);
-                showToast("商品加载失败，请检查 goods.json");
-            }
+    function renderCategories() {
+      const categories = ['全部', ...new Set(allGoods.map(item => item.category))];
+      document.getElementById('categoryBar').innerHTML = categories.map(cat => `
+        <div class="category-item ${cat === currentCategory ? 'active' : ''}" onclick="selectCategory('${cat}')">${cat}</div>
+      `).join('');
+    }
+
+    function renderGoods() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const list = document.getElementById('goodsList');
+
+      const filtered = allGoods.filter(item => {
+        const matchCategory = currentCategory === '全部' || item.category === currentCategory;
+        const matchSearch = item.title.toLowerCase().includes(keyword) || item.desc.toLowerCase().includes(keyword);
+        return matchCategory && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 30px;">未找到商品</p>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(good => {
+        const selectedSpecs = cardSelectedOptions[good.id] || {};
+        const displayPrice = getDynamicPrice(good, selectedSpecs);
+
+        // 构建卡片上的规格点击按钮
+        let specHtml = '';
+        if (good.options && good.options.length > 0) {
+          specHtml = `<div class="card-spec-section">` + good.options.map(opt => `
+            <div class="card-spec-group">
+              <div class="card-spec-title">${opt.name}:</div>
+              <div class="card-spec-items">
+                ${opt.values.map(val => {
+                  const valName = typeof val === 'object' ? val.name : val;
+                  const isSelected = selectedSpecs[opt.name] === valName;
+                  return `<button class="card-spec-btn ${isSelected ? 'selected' : ''}" onclick="changeCardSpec(${good.id}, '${opt.name}', '${valName}')">${valName}</button>`;
+                }).join('')}
+              </div>
+            </div>
+          `).join('') + `</div>`;
         }
 
-        function renderCategories() {
-            const categories = ["全部", ...new Set(allGoods.map(item => item.category))];
-            const container = document.getElementById("categoryContainer");
-            container.innerHTML = categories.map(cat => `
-                <button onclick="selectCategory('${cat}')" 
-                        class="px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap transition ${
-                            cat === currentCategory ? 'bg-brand-600 text-white font-medium shadow-sm' : 'bg-gray-100 text-gray-600'
-                        }">${cat}</button>
-            `).join('');
+        return `
+          <div class="goods-card">
+            <img class="goods-img" src="${good.image}" alt="${good.title}">
+            <div class="goods-info">
+              <div>
+                <div class="goods-title">${good.title}</div>
+                <div class="goods-price" id="price-${good.id}">${displayPrice}</div>
+                ${specHtml}
+              </div>
+              <div class="card-actions">
+                <button class="btn-cart" onclick="addCardToCart(${good.id})">+ 购物车</button>
+                <button class="btn-buy" onclick="buyCardNow(${good.id})">直接购买</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 计算选中规格后的动态价格
+    function getDynamicPrice(good, selectedSpecs) {
+      if (!good.options) return good.price;
+      for (let opt of good.options) {
+        for (let val of opt.values) {
+          if (typeof val === 'object' && selectedSpecs[opt.name] === val.name && val.price) {
+            return `￥${val.price}`;
+          }
         }
+      }
+      return good.price;
+    }
 
-        function selectCategory(cat) {
-            currentCategory = cat;
-            renderCategories();
-            filterGoods();
-        }
+    // 切换卡片上的规格
+    function changeCardSpec(goodId, specName, valName) {
+      cardSelectedOptions[goodId][specName] = valName;
+      renderGoods(); // 刷新重新渲染卡片
+    }
 
-        function filterGoods() {
-            const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
-            const filtered = allGoods.filter(item => {
-                const matchCategory = currentCategory === "全部" || item.category === currentCategory;
-                const matchKeyword = item.title.toLowerCase().includes(keyword) || (item.desc && item.desc.toLowerCase().includes(keyword));
-                return matchCategory && matchKeyword;
-            });
-            renderGoods(filtered);
-        }
+    function selectCategory(cat) {
+      currentCategory = cat;
+      renderCategories();
+      renderGoods();
+    }
 
-        function renderGoods(goodsList) {
-            const grid = document.getElementById("goodsGrid");
-            const empty = document.getElementById("emptyState");
-            if (goodsList.length === 0) {
-                grid.innerHTML = "";
-                empty.classList.remove("hidden");
-                return;
-            }
-            empty.classList.add("hidden");
-            grid.innerHTML = goodsList.map(item => `
-                <div onclick="openDetailModal(${item.id})" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100/80 flex flex-col cursor-pointer active:scale-98 transition-transform">
-                    <div class="h-36 w-full bg-gray-50 relative">
-                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
-                        ${item.options && item.options.length > 0 ? '<span class="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-[9px] px-1.5 py-0.5 rounded-md backdrop-blur-sm">多规格</span>' : ''}
-                    </div>
-                    <div class="p-2.5 flex-1 flex flex-col justify-between">
-                        <h3 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1.5">${item.title}</h3>
-                        <div class="flex items-baseline justify-between mt-auto">
-                            <div class="text-brand-600">
-                                <span class="text-[10px] font-bold">￥</span>
-                                <span class="text-sm font-black">${getDisplayPrice(item)}</span>
-                            </div>
-                            <span class="text-[10px] bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full font-medium">选购</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
+    function filterGoods() {
+      renderGoods();
+    }
 
-        function getDisplayPrice(item) {
-            if (typeof item.price === 'string') return item.price.replace('￥', '');
-            return item.price;
-        }
+    // 从卡片直接加入购物车
+    function addCardToCart(goodId) {
+      const good = allGoods.find(g => g.id === goodId);
+      const selectedSpecs = cardSelectedOptions[goodId] || {};
+      const specText = Object.keys(selectedSpecs).length > 0 
+        ? Object.entries(selectedSpecs).map(([k, v]) => `${k}:${v}`).join('; ') 
+        : '标准规格';
+      const price = getDynamicPrice(good, selectedSpecs);
 
-        function openDetailModal(id) {
-            activeItem = allGoods.find(g => g.id === id);
-            if (!activeItem) return;
+      const exist = cart.find(item => item.good.id === good.id && item.specText === specText);
+      if (exist) {
+        exist.qty += 1;
+      } else {
+        cart.push({ good, specText, price, qty: 1 });
+      }
 
-            modalQuantity = 1;
-            selectedSpecs = {};
-            document.getElementById("modalImage").src = activeItem.image;
-            document.getElementById("modalTitle").innerText = activeItem.title;
-            document.getElementById("modalDesc").innerText = activeItem.desc || "暂无商品详情描述。";
-            document.getElementById("modalQtyDisplay").innerText = modalQuantity;
+      updateCartBadge();
+      alert(`已添加：${good.title} (${specText})`);
+    }
 
-            // 构造规格 Chips UI
-            const container = document.getElementById("optionsContainer");
-            if (activeItem.options && activeItem.options.length > 0) {
-                container.innerHTML = activeItem.options.map(optGroup => {
-                    // 默认选择每个规格组的第一个选项
-                    const firstVal = typeof optGroup.values[0] === 'object' ? optGroup.values[0].name : optGroup.values[0];
-                    selectedSpecs[optGroup.name] = firstVal;
+    function buyCardNow(goodId) {
+      addCardToCart(goodId);
+      openCartModal();
+    }
 
-                    return `
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-gray-800">${optGroup.name}</span>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                ${optGroup.values.map(val => {
-                                    const valName = typeof val === 'object' ? val.name : val;
-                                    const valPrice = typeof val === 'object' ? val.price : null;
-                                    return `
-                                        <button type="button" 
-                                                onclick="selectSpecChip('${optGroup.name}', '${valName}', this)"
-                                                data-group="${optGroup.name}"
-                                                data-val="${valName}"
-                                                class="chip-option chip-${sanitizeId(optGroup.name)} text-xs px-3.5 py-2 rounded-xl border border-gray-200 text-gray-700 bg-gray-50 flex items-center space-x-1">
-                                            <span>${valName}</span>
-                                            ${valPrice ? `<span class="text-[10px] opacity-75">￥${valPrice}</span>` : ''}
-                                        </button>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+    function updateCartBadge() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cartBadge').innerText = totalCount;
+    }
 
-                // 首次高亮默认值
-                Object.keys(selectedSpecs).forEach(groupName => {
-                    updateChipStyle(groupName, selectedSpecs[groupName]);
-                });
-            } else {
-                container.innerHTML = '<p class="text-xs text-gray-400 py-1">标准规格</p>';
-            }
+    function openCartModal() {
+      renderCartItems();
+      document.getElementById('cartModal').classList.add('active');
+    }
 
-            recalculateModalPriceAndSummary();
-            document.getElementById("detailModal").classList.remove("hidden");
-        }
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsList');
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">购物车为空</p>';
+        document.getElementById('cartTotalPrice').innerText = '￥0';
+        return;
+      }
 
-        function selectSpecChip(groupName, valueName, btnEl) {
-            selectedSpecs[groupName] = valueName;
-            updateChipStyle(groupName, valueName);
-            recalculateModalPriceAndSummary();
-        }
+      let total = 0;
+      container.innerHTML = cart.map((item, idx) => {
+        const numPrice = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+        total += numPrice * item.qty;
 
-        function updateChipStyle(groupName, selectedValue) {
-            const groupBtns = document.querySelectorAll(`.chip-${sanitizeId(groupName)}`);
-            groupBtns.forEach(btn => {
-                if (btn.getAttribute('data-val') === selectedValue) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-        }
+        return `
+          <div class="cart-item">
+            <div>
+              <div class="cart-item-title">${item.good.title}</div>
+              <div class="cart-item-spec">${item.specText}</div>
+              <div class="cart-item-price">${item.price}</div>
+            </div>
+            <div class="cart-item-control">
+              <button class="btn-qty" onclick="changeQty(${idx}, -1)">-</button>
+              <span>${item.qty}</span>
+              <button class="btn-qty" onclick="changeQty(${idx}, 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
 
-        function recalculateModalPriceAndSummary() {
-            if (!activeItem) return;
+      document.getElementById('cartTotalPrice').innerText = `￥${total.toFixed(2)}`;
+    }
 
-            let finalPrice = parseFloat(getDisplayPrice(activeItem));
+    function changeQty(idx, change) {
+      cart[idx].qty += change;
+      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      updateCartBadge();
+      renderCartItems();
+    }
 
-            // 如果某些规格有特殊加价/独立价格，计算价格 override
-            if (activeItem.options) {
-                activeItem.options.forEach(optGroup => {
-                    const chosenValName = selectedSpecs[optGroup.name];
-                    const matchedObj = optGroup.values.find(v => typeof v === 'object' && v.name === chosenValName);
-                    if (matchedObj && matchedObj.price) {
-                        finalPrice = parseFloat(matchedObj.price);
-                    }
-                });
-            }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
 
-            document.getElementById("modalPrice").innerText = finalPrice.toFixed(2);
+    function submitCartOrder() {
+      if (cart.length === 0) return;
 
-            // 更新顶部已选文本提示
-            const specSummaryText = Object.entries(selectedSpecs)
-                .map(([k, v]) => `【${v}】`)
-                .join(" ");
-            
-            document.getElementById("selectedSpecSummary").innerText = specSummaryText ? `已选: ${specSummaryText}` : "已选: 标准规格";
-        }
+      let orderText = `【微信下单列表】\n------------------\n`;
+      let total = 0;
 
-        function changeModalQty(delta) {
-            modalQuantity = Math.max(1, modalQuantity + delta);
-            document.getElementById("modalQtyDisplay").innerText = modalQuantity;
-        }
+      cart.forEach((item, i) => {
+        orderText += `${i + 1}. ${item.good.title}\n   规格: ${item.specText}\n   价格: ${item.price} x ${item.qty}件\n`;
+        const numPrice = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+        total += numPrice * item.qty;
+      });
 
-        function closeDetailModal() {
-            document.getElementById("detailModal").classList.add("hidden");
-        }
+      orderText += `------------------\n预估总计：￥${total.toFixed(2)}\n\n请确认是否有货，谢谢！`;
 
-        function sanitizeId(str) {
-            return str.replace(/[^a-zA-Z0-9]/g, '_');
-        }
-
-        function getCurrentModalItemData() {
-            const currentPrice = parseFloat(document.getElementById("modalPrice").innerText);
-            const specText = Object.entries(selectedSpecs).map(([k, v]) => `${k}:${v}`).join(' / ') || '标准规格';
-            return {
-                id: activeItem.id,
-                title: activeItem.title,
-                price: currentPrice,
-                specs: specText,
-                qty: modalQuantity
-            };
-        }
-
-        function addModalItemToCart() {
-            const itemData = getCurrentModalItemData();
-            addToCartList(itemData);
-            closeDetailModal();
-            showToast("已放入购物车");
-        }
-
-        function buyNowFromModal() {
-            const itemData = getCurrentModalItemData();
-            const orderContent = generateSingleOrderText(itemData);
-            copyToClipboard(orderContent, () => {
-                closeDetailModal();
-                openContactModal();
-            });
-        }
-
-        function addToCartList(newItem) {
-            const existingIdx = cart.findIndex(c => c.id === newItem.id && c.specs === newItem.specs);
-            if (existingIdx > -1) {
-                cart[existingIdx].qty += newItem.qty;
-            } else {
-                cart.push(newItem);
-            }
-            updateCartBadge();
-        }
-
-        function updateCartBadge() {
-            const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
-            document.getElementById("cartBadge").innerText = totalCount;
-            document.getElementById("cartCountTitle").innerText = `${totalCount} 件商品`;
-        }
-
-        function openCartModal() {
-            renderCartList();
-            document.getElementById("cartModal").classList.remove("hidden");
-        }
-
-        function closeCartModal() {
-            document.getElementById("cartModal").classList.add("hidden");
-        }
-
-        function renderCartList() {
-            const container = document.getElementById("cartItemsContainer");
-            if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-gray-400 text-xs">购物车还是空的，去挑选一件吧</div>`;
-                document.getElementById("cartTotalAmount").innerText = "0.00";
-                return;
-            }
-
-            let total = 0;
-            container.innerHTML = cart.map((item, idx) => {
-                const subtotal = item.price * item.qty;
-                total += subtotal;
-                return `
-                    <div class="py-3 flex justify-between items-center">
-                        <div class="flex-1 pr-3">
-                            <h4 class="text-xs font-bold text-gray-800 line-clamp-1">${item.title}</h4>
-                            <p class="text-[10px] text-gray-400 mt-0.5">${item.specs}</p>
-                            <span class="text-xs font-bold text-brand-600 mt-1 block">￥${item.price.toFixed(2)}</span>
-                        </div>
-                        <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
-                            <button onclick="updateCartQty(${idx}, -1)" class="w-6 h-6 bg-white text-gray-700 rounded font-bold text-xs shadow-sm flex items-center justify-center">-</button>
-                            <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
-                            <button onclick="updateCartQty(${idx}, 1)" class="w-6 h-6 bg-white text-gray-700 rounded font-bold text-xs shadow-sm flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById("cartTotalAmount").innerText = total.toFixed(2);
-        }
-
-        function updateCartQty(idx, delta) {
-            cart[idx].qty += delta;
-            if (cart[idx].qty <= 0) {
-                cart.splice(idx, 1);
-            }
-            updateCartBadge();
-            renderCartList();
-        }
-
-        function clearCart() {
-            cart = [];
-            updateCartBadge();
-            renderCartList();
-        }
-
-        function generateSingleOrderText(item) {
-            const total = (item.price * item.qty).toFixed(2);
-            return `【购买意向单】\n` +
-                   `商品：${item.title}\n` +
-                   `规格：${item.specs}\n` +
-                   `数量：${item.qty} 件\n` +
-                   `金额：￥${total}\n` +
-                   `------------------\n` +
-                   `请确认是否有现货并安排发货，谢谢！`;
-        }
-
-        function submitCartOrder() {
-            if (cart.length === 0) {
-                showToast("购物车是空的");
-                return;
-            }
-
-            let text = `【多件商品订货单】\n------------------\n`;
-            let total = 0;
-            cart.forEach((item, i) => {
-                const sub = item.price * item.qty;
-                total += sub;
-                text += `${i + 1}. ${item.title}\n   规格：${item.specs}\n   单价：￥${item.price.toFixed(2)} x ${item.qty}\n`;
-            });
-
-            text += `------------------\n`;
-            text += `预计总金额：￥${total.toFixed(2)}\n`;
-            text += `请确认订单，谢谢！`;
-
-            copyToClipboard(text, () => {
-                closeCartModal();
-                openContactModal();
-            });
-        }
-
-        function copyToClipboard(text, onSuccess) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast("订单已复制！");
-                    if (onSuccess) onSuccess();
-                }).catch(() => fallbackCopy(text, onSuccess));
-            } else {
-                fallbackCopy(text, onSuccess);
-            }
-        }
-
-        function fallbackCopy(text, onSuccess) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("订单已复制！");
-                if (onSuccess) onSuccess();
-            } catch (err) {
-                showToast("复制失败，请直接截图发送店主");
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function openContactModal() {
-            document.getElementById("contactModal").classList.remove("hidden");
-        }
-
-        function closeContactModal() {
-            document.getElementById("contactModal").classList.add("hidden");
-        }
-
-        function copyWechatIdOnly() {
-            copyToClipboard(WECHAT_ID, () => {
-                showToast("微信号已复制！");
-            });
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById("toast");
-            toast.innerText = msg;
-            toast.classList.remove("hidden");
-            setTimeout(() => toast.classList.add("hidden"), 2000);
-        }
-    </script>
+      navigator.clipboard.writeText(orderText).then(() => {
+        closeModal('cartModal');
+        document.getElementById('wechatIdText').innerText = WECHAT_ID;
+        document.getElementById('ownerQr').src = QR_CODE_URL;
+        document.getElementById('qrModal').classList.add('active');
+      }).catch(() => alert('订单已生成，请直接截图发送给店主。'));
+    }
+  </script>
 </body>
 </html>
