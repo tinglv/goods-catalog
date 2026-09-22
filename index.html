@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>店主精选 - 商品目录</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 隐藏滚动条但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased font-sans pb-20">
+
+    <!-- 顶部导航 / 店铺信息 -->
+    <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-gray-100">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-lg shadow">
+                    店
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-gray-900 leading-tight">微商精选小店</h1>
+                    <p class="text-xs text-gray-500">挑选心仪商品，联系店主直接购买</p>
+                </div>
+            </div>
+            <button onclick="openContactModal()" class="bg-red-50 text-red-600 text-xs px-3 py-1.5 rounded-full font-medium border border-red-200 hover:bg-red-100 transition">
+                联系店主
+            </button>
+        </div>
+
+        <!-- 搜索与分类栏 -->
+        <div class="max-w-md mx-auto px-4 pb-3">
+            <div class="relative my-2">
+                <input type="text" id="searchInput" placeholder="搜索商品名称或关键词..." 
+                       class="w-full bg-gray-100 text-sm pl-9 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            
+            <!-- 分类标签 -->
+            <div id="categoryContainer" class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
+                <!-- 动态渲染分类 -->
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体：商品列表 -->
+    <main class="max-w-md mx-auto px-3 pt-3">
+        <div id="goodsGrid" class="grid grid-cols-2 gap-2.5">
+            <!-- 动态渲染商品列表 -->
+        </div>
+
+        <!-- 空状态提示 -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <p class="text-gray-400 text-sm">暂无符合条件的商品</p>
+        </div>
+    </main>
+
+    <!-- 商品详情弹窗 -->
+    <div id="detailModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center sm:items-center">
+        <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto relative animate-fade-in">
+            <!-- 关闭按钮 -->
+            <button onclick="closeDetailModal()" class="absolute right-3 top-3 z-10 bg-black/40 text-white w-7 h-7 rounded-full flex items-center justify-center">
+                ✕
+            </button>
+            
+            <!-- 商品大图 -->
+            <div class="w-full h-72 bg-gray-100 relative">
+                <img id="modalImage" src="" alt="" class="w-full h-full object-cover">
+            </div>
+
+            <div class="p-4">
+                <div class="flex justify-between items-baseline mb-2">
+                    <span id="modalPrice" class="text-2xl font-bold text-red-600"></span>
+                    <span id="modalCategory" class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded"></span>
+                </div>
+                <h2 id="modalTitle" class="text-lg font-bold text-gray-900 mb-3"></h2>
+                
+                <div class="border-t border-gray-100 pt-3 mb-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">商品详情</h3>
+                    <p id="modalDesc" class="text-sm text-gray-600 whitespace-pre-line leading-relaxed"></p>
+                </div>
+
+                <!-- 底部联系按钮 -->
+                <button onclick="copyWechatAndShowQR()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-red-200 transition flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8.5,13.5 C9.32842712,13.5 10,12.8284271 10,12 C10,11.1715729 9.32842712,10.5 8.5,10.5 C7.67157288,10.5 7,11.1715729 7,12 C7,12.8284271 7.67157288,13.5 8.5,13.5 Z M15.5,13.5 C16.3284271,13.5 17,12.8284271 17,12 C17,11.1715729 16.3284271,10.5 15.5,10.5 C14.6715729,10.5 14,11.1715729 14,12 C14,12.8284271 14.6715729,13.5 15.5,13.5 Z"></path>
+                    </svg>
+                    <span>复制微信号并联系店主购买</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系店主 / 收款二维码弹窗 -->
+    <div id="contactModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xs rounded-2xl p-5 text-center relative">
+            <button onclick="closeContactModal()" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                ✕
+            </button>
+            
+            <h3 class="text-base font-bold text-gray-900 mb-1">联系店主购买</h3>
+            <p class="text-xs text-gray-500 mb-4">长按二维码添加好友或转账</p>
+
+            <!-- 店主微信二维码图片 (替换为你的实际图片) -->
+            <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg mb-3 overflow-hidden border">
+                <img id="qrImage" src="https://via.placeholder.com/300x300?text=WeChat+QR" alt="店主二维码" class="w-full h-full object-cover">
+            </div>
+
+            <div class="bg-gray-50 p-2.5 rounded-lg mb-4 flex items-center justify-between">
+                <span class="text-xs text-gray-500">微信号：</span>
+                <span id="wechatIdText" class="text-sm font-bold text-gray-800">your_wechat_id</span>
+            </div>
+
+            <button onclick="copyWechatId()" class="w-full bg-gray-900 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-black transition">
+                复制微信号
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-2 rounded-full z-50 hidden">
+        已复制微信号到剪贴板
+    </div>
+
+    <script>
+        // 配置信息
+        const WECHAT_ID = "wx_shop_owner"; // 替换为你的真实微信号
+        const QR_CODE_URL = "https://via.placeholder.com/300x300?text=WeChat+QR"; // 替换为你的微信二维码图片链接
+
+        let allGoods = [];
+        let currentCategory = "全部";
+
+        // 初始化页面
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("wechatIdText").innerText = WECHAT_ID;
+            document.getElementById("qrImage").src = QR_CODE_URL;
+            
+            // 读取 JSON 数据
+            fetchGoodsData();
+
+            // 监听搜索输入
+            document.getElementById("searchInput").addEventListener("input", filterGoods);
+        });
+
+        // 异步获取静态 JSON 文件
+        async function fetchGoodsData() {
+            try {
+                const res = await fetch('goods.json');
+                allGoods = await res.json();
+                renderCategories();
+                renderGoods(allGoods);
+            } catch (err) {
+                console.error("加载商品数据失败:", err);
+            }
+        }
+
+        // 渲染分类
+        function renderCategories() {
+            const categories = ["全部", ...new Set(allGoods.map(item => item.category))];
+            const container = document.getElementById("categoryContainer");
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="selectCategory('${cat}')" 
+                        class="px-3 py-1 rounded-full text-xs whitespace-nowrap transition ${
+                            cat === currentCategory 
+                            ? 'bg-red-600 text-white font-medium' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // 选择分类
+        function selectCategory(cat) {
+            currentCategory = cat;
+            renderCategories();
+            filterGoods();
+        }
+
+        // 筛选商品
+        function filterGoods() {
+            const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+            const filtered = allGoods.filter(item => {
+                const matchCategory = currentCategory === "全部" || item.category === currentCategory;
+                const matchKeyword = item.title.toLowerCase().includes(keyword) || item.desc.toLowerCase().includes(keyword);
+                return matchCategory && matchKeyword;
+            });
+            renderGoods(filtered);
+        }
+
+        // 渲染商品列表
+        function renderGoods(goodsList) {
+            const grid = document.getElementById("goodsGrid");
+            const empty = document.getElementById("emptyState");
+
+            if (goodsList.length === 0) {
+                grid.innerHTML = "";
+                empty.classList.remove("hidden");
+                return;
+            }
+
+            empty.classList.add("hidden");
+            grid.innerHTML = goodsList.map(item => `
+                <div onclick="openDetailModal(${item.id})" class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer active:scale-95 transition-transform">
+                    <div class="h-40 w-full bg-gray-50 relative">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-2.5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-800 line-clamp-2 mb-1">${item.title}</h3>
+                        </div>
+                        <div class="flex items-baseline justify-between mt-2">
+                            <span class="text-sm font-bold text-red-600">￥${item.price}</span>
+                            <span class="text-[10px] text-gray-400">详情 ></span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 打开商品详情弹窗
+        function openDetailModal(id) {
+            const item = allGoods.find(g => g.id === id);
+            if (!item) return;
+
+            document.getElementById("modalImage").src = item.image;
+            document.getElementById("modalTitle").innerText = item.title;
+            document.getElementById("modalPrice").innerText = `￥${item.price}`;
+            document.getElementById("modalCategory").innerText = item.category;
+            document.getElementById("modalDesc").innerText = item.desc;
+
+            document.getElementById("detailModal").classList.remove("hidden");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.add("hidden");
+        }
+
+        // 打开/关闭联系店主弹窗
+        function openContactModal() {
+            document.getElementById("contactModal").classList.remove("hidden");
+        }
+
+        function closeContactModal() {
+            document.getElementById("contactModal").classList.add("hidden");
+        }
+
+        // 复制微信号并打开二维码弹窗
+        function copyWechatAndShowQR() {
+            copyWechatId();
+            closeDetailModal();
+            openContactModal();
+        }
+
+        // 复制微信号函数
+        function copyWechatId() {
+            navigator.clipboard.writeText(WECHAT_ID).then(() => {
+                showToast("已复制微信号，快去微信添加吧！");
+            }).catch(() => {
+                showToast("复制失败，请手动复制微信号");
+            });
+        }
+
+        // 显示 Toast 提示
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.classList.remove("hidden");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
