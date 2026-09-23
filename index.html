@@ -3,72 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Here Store 商品展示</title>
+  <title>The Here Store - 精选目录</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f6f6f6; color: #333; padding-bottom: 80px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f5f2eb; color: #2d2926; padding-bottom: 80px; }
     
-    header { background: #07c160; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-    header h1 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .search-box { width: 100%; max-width: 500px; padding: 8px 14px; border: none; border-radius: 20px; font-size: 14px; outline: none; }
+    /* 顶部导航栏 - 复古墨绿 */
+    header { background: #4a5b46; color: #f7f5f0; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(45,41,38,0.12); }
+    header h1 { font-size: 19px; font-weight: 500; letter-spacing: 1px; margin-bottom: 10px; font-family: "Georgia", serif, sans-serif; }
+    .search-box { width: 100%; max-width: 500px; padding: 8px 16px; border: 1px solid #3c4a38; border-radius: 20px; font-size: 13px; outline: none; background: rgba(255,255,255,0.95); color: #2d2926; }
+    .search-box::placeholder { color: #888; }
 
-    .category-bar { display: flex; overflow-x: auto; background: white; padding: 10px; gap: 8px; border-bottom: 1px solid #eee; position: sticky; top: 73px; z-index: 99; }
-    .category-item { padding: 5px 12px; background: #f0f0f0; border-radius: 14px; font-size: 13px; color: #666; white-space: nowrap; cursor: pointer; }
-    .category-item.active { background: #07c160; color: white; font-weight: bold; }
+    /* 分类栏 - 大地暖米色 */
+    .category-bar { display: flex; overflow-x: auto; background: #ebdccb; padding: 10px 12px; gap: 8px; border-bottom: 1px solid #dfcfbc; position: sticky; top: 76px; z-index: 99; }
+    .category-item { padding: 5px 14px; background: #fdfcf9; border-radius: 16px; font-size: 12px; color: #5a4f43; white-space: nowrap; cursor: pointer; border: 1px solid #dcd1c2; transition: all 0.2s; }
+    .category-item.active { background: #4a5b46; color: #f7f5f0; border-color: #4a5b46; font-weight: 600; }
 
-    .goods-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; max-width: 800px; margin: 0 auto; }
-    .goods-card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; }
-    .goods-img { width: 100%; height: 150px; object-fit: cover; }
+    /* 商品列表网格 */
+    .goods-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; max-width: 800px; margin: 0 auto; }
+    .goods-card { background: #fdfcf9; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #eee8dd; display: flex; flex-direction: column; justify-content: space-between; }
+    .goods-img { width: 100%; height: 155px; object-fit: cover; }
     .goods-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .goods-title { font-size: 14px; font-weight: bold; line-height: 1.3; margin-bottom: 6px; color: #222; }
-    .goods-price { color: #fa5151; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .goods-title { font-size: 14px; font-weight: 600; line-height: 1.35; margin-bottom: 6px; color: #2d2926; }
+    .goods-price { color: #8c3b2b; font-size: 16px; font-weight: 700; margin-bottom: 8px; font-family: "Georgia", serif, sans-serif; }
 
-    /* 卡片上的规格展示样式 */
-    .card-spec-section { margin-bottom: 10px; background: #fafafa; padding: 6px; border-radius: 6px; }
+    /* 卡片规格区域 */
+    .card-spec-section { margin-bottom: 10px; background: #f7f3eb; padding: 6px 8px; border-radius: 6px; border: 1px dashed #e2d9cb; }
     .card-spec-group { margin-bottom: 6px; }
     .card-spec-group:last-child { margin-bottom: 0; }
-    .card-spec-title { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .card-spec-title { font-size: 11px; color: #7a6e60; margin-bottom: 4px; }
     .card-spec-items { display: flex; flex-wrap: wrap; gap: 4px; }
-    .card-spec-btn { padding: 3px 8px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 11px; background: white; color: #444; cursor: pointer; transition: all 0.15s ease; }
-    .card-spec-btn.selected { border-color: #07c160; color: #07c160; background: #f0f9f4; font-weight: bold; }
+    .card-spec-btn { padding: 3px 8px; border: 1px solid #d3c7b7; border-radius: 4px; font-size: 11px; background: #ffffff; color: #4a4035; cursor: pointer; transition: all 0.15s ease; }
+    .card-spec-btn.selected { border-color: #8c3b2b; color: #8c3b2b; background: #fbf2f0; font-weight: bold; }
 
+    /* 按钮组 */
     .card-actions { display: flex; gap: 6px; }
-    .btn-cart { flex: 1; background: #e8f7ee; color: #07c160; border: none; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-    .btn-buy { flex: 1; background: #07c160; color: white; border: none; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .btn-cart { flex: 1; background: #e6edd2; color: #3b4d37; border: 1px solid #cad6a9; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-buy { flex: 1; background: #8c3b2b; color: #ffffff; border: none; padding: 7px 0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
-    /* 悬浮购物车按钮 */
-    .cart-float-btn { position: fixed; right: 20px; bottom: 20px; background: #ff5000; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(255,80,0,0.4); cursor: pointer; z-index: 1000; }
+    /* 悬浮购物车 */
+    .cart-float-btn { position: fixed; right: 20px; bottom: 20px; background: #8c3b2b; color: #ffffff; width: 56px; height: 56px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(140,59,43,0.35); cursor: pointer; z-index: 1000; }
     .cart-float-btn .icon { font-size: 20px; line-height: 1; }
     .cart-float-btn .text { font-size: 10px; margin-top: 2px; }
-    .cart-badge { position: absolute; top: -2px; right: -2px; background: #fa5151; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold; border: 2px solid white; }
+    .cart-badge { position: absolute; top: -2px; right: -2px; background: #4a5b46; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold; border: 2px solid #ffffff; }
 
     /* 弹窗通用样式 */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: flex-end; z-index: 1001; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(30,25,20,0.65); display: none; justify-content: center; align-items: flex-end; z-index: 1001; }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 16px 16px 0 0; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; animation: slideUp 0.3s ease-out; }
+    .modal-content { background: #fdfcf9; width: 100%; max-width: 600px; border-radius: 16px 16px 0 0; max-height: 85vh; overflow-y: auto; padding: 20px; position: relative; animation: slideUp 0.3s ease-out; border-top: 3px solid #4a5b46; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .close-btn { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #999; cursor: pointer; line-height: 1; }
+    .close-btn { position: absolute; right: 15px; top: 15px; font-size: 24px; color: #888; cursor: pointer; line-height: 1; }
 
     /* 购物车列表 */
-    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-    .cart-item-title { font-size: 14px; font-weight: bold; }
-    .cart-item-spec { font-size: 12px; color: #888; margin-top: 2px; }
-    .cart-item-price { color: #fa5151; font-size: 14px; font-weight: bold; margin-top: 2px; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0e8dc; }
+    .cart-item-title { font-size: 14px; font-weight: bold; color: #2d2926; }
+    .cart-item-spec { font-size: 12px; color: #7a6e60; margin-top: 2px; }
+    .cart-item-price { color: #8c3b2b; font-size: 14px; font-weight: bold; margin-top: 2px; }
     .cart-item-control { display: flex; align-items: center; gap: 8px; }
-    .btn-qty { width: 26px; height: 26px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    .btn-qty { width: 26px; height: 26px; border: 1px solid #d3c7b7; background: #f7f3eb; border-radius: 4px; font-weight: bold; color: #4a4035; cursor: pointer; }
 
-    .btn-submit-order { width: 100%; background: #07c160; color: white; border: none; padding: 12px 0; border-radius: 25px; font-size: 15px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+    .btn-submit-order { width: 100%; background: #4a5b46; color: #f7f5f0; border: none; padding: 12px 0; border-radius: 25px; font-size: 15px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 
     /* 二维码弹窗 */
     .qr-box { text-align: center; padding: 10px 0; }
-    .qr-img { width: 200px; height: 200px; margin: 10px auto; display: block; border: 1px solid #eee; }
+    .qr-img { width: 200px; height: 200px; margin: 10px auto; display: block; border: 1px solid #e0d8cb; border-radius: 8px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>The Here Store 商品展示目录</h1>
-    <input type="text" class="search-box" id="searchInput" placeholder="搜索商品..." oninput="filterGoods()">
+    <h1>The Here Store</h1>
+    <input type="text" class="search-box" id="searchInput" placeholder="搜索商品名称..." oninput="filterGoods()">
   </header>
 
   <div class="category-bar" id="categoryBar">
@@ -80,7 +85,7 @@
   <!-- 悬浮购物车按钮 -->
   <div class="cart-float-btn" onclick="openCartModal()">
     <span class="icon">🛒</span>
-    <span class="text">购物车</span>
+    <span class="text">清单</span>
     <span class="cart-badge" id="cartBadge">0</span>
   </div>
 
@@ -88,11 +93,11 @@
   <div class="modal-overlay" id="cartModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
-      <h3 style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">已选商品清单</h3>
+      <h3 style="margin-bottom: 15px; border-bottom: 1px solid #eae2d5; padding-bottom: 10px; color: #2d2926;">已选商品清单</h3>
       <div id="cartItemsList"></div>
-      <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+      <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #eae2d5; display: flex; justify-content: space-between; align-items: center;">
         <span>合计预估：</span>
-        <span style="color: #fa5151; font-size: 18px; font-weight: bold;" id="cartTotalPrice">￥0</span>
+        <span style="color: #8c3b2b; font-size: 18px; font-weight: bold;" id="cartTotalPrice">￥0</span>
       </div>
       <button class="btn-submit-order" onclick="submitCartOrder()">复制订单并联系店主购买</button>
     </div>
@@ -103,17 +108,16 @@
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('qrModal')">&times;</span>
       <div class="qr-box">
-        <h3 style="color: #07c160; margin-bottom: 8px;">订单信息已复制！</h3>
+        <h3 style="color: #4a5b46; margin-bottom: 8px;">订单信息已复制！</h3>
         <p style="font-size: 13px; color: #666;">请在微信中粘贴发送给店主，长按扫描二维码添加微信：</p>
-        <img id="ownerQr" class="qr-img" src="./wechat.png" alt="微信二维码">
-        <p style="font-size: 14px; font-weight: bold;">微信号：<span id="wechatIdText">-Oo1998oO-</span></p>
+        <img id="ownerQr" class="qr-img" src="" alt="微信二维码">
+        <p style="font-size: 14px; font-weight: bold; margin-top: 8px; color: #2d2926;">微信号：<span id="wechatIdText"></span></p>
       </div>
     </div>
   </div>
 
   <script>
-    // 配置个人微信信息
-    const WECHAT_ID = "-Oo1998oO-"; 
+    const WECHAT_ID = "-Oo1998oO-"; // 替换为你的真实微信号
     const QR_CODE_URL = "./wechat.png"; // 二维码图片相对路径
 
     let allGoods = [];
@@ -121,7 +125,6 @@
     let cardSelectedOptions = {}; 
     let cart = [];
 
-    // 初始化获取商品数据
     fetch('goods.json')
       .then(res => res.json())
       .then(data => {
@@ -149,7 +152,6 @@
       `).join('');
     }
 
-    // 列表渲染
     function renderGoods() {
       const keyword = document.getElementById('searchInput').value.toLowerCase();
       const list = document.getElementById('goodsList');
@@ -195,8 +197,8 @@
                 ${specHtml}
               </div>
               <div class="card-actions">
-                <button class="btn-cart" onclick="addCardToCart(${good.id})">+ 购物车</button>
-                <button class="btn-buy" onclick="buyCardNow(${good.id})">直接购买</button>
+                <button class="btn-cart" onclick="addCardToCart(${good.id})">+ 清单</button>
+                <button class="btn-buy" onclick="buyCardNow(${good.id})">购买</button>
               </div>
             </div>
           </div>
@@ -204,23 +206,18 @@
       }).join('');
     }
 
-    // 核心优化：局部无缝刷新规格选中状态与价格
     function changeCardSpec(btnEl, goodId, specName, valName) {
-      // 1. 更新数据模型
       cardSelectedOptions[goodId][specName] = valName;
       
-      // 2. 精准定位当前商品卡片
       const cardEl = document.getElementById(`goods-card-${goodId}`);
       if (!cardEl) return;
 
-      // 3. 仅切换当前规格组的按钮高亮（无重绘/不闪屏）
       const groupEl = btnEl.closest('.card-spec-group');
       if (groupEl) {
         groupEl.querySelectorAll('.card-spec-btn').forEach(btn => btn.classList.remove('selected'));
         btnEl.classList.add('selected');
       }
 
-      // 4. 仅更新当前卡片上的价格
       const good = allGoods.find(g => g.id === goodId);
       const newPrice = getDynamicPrice(good, cardSelectedOptions[goodId]);
       const priceEl = cardEl.querySelector('.goods-price');
@@ -294,7 +291,7 @@
     function renderCartItems() {
       const container = document.getElementById('cartItemsList');
       if (cart.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">购物车为空</p>';
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">清单为空</p>';
         document.getElementById('cartTotalPrice').innerText = '￥0';
         return;
       }
@@ -337,7 +334,7 @@
     function submitCartOrder() {
       if (cart.length === 0) return;
 
-      let orderText = `【微信下单列表】\n------------------\n`;
+      let orderText = `【The Here Store 选购清单】\n------------------\n`;
       let total = 0;
 
       cart.forEach((item, i) => {
