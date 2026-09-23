@@ -47,6 +47,32 @@
     .cart-float-btn .text { font-size: 10px; margin-top: 2px; }
     .cart-badge { position: absolute; top: -2px; right: -2px; background: #4a5b46; color: white; border-radius: 10px; padding: 2px 6px; font-size: 11px; font-weight: bold; border: 2px solid #ffffff; }
 
+    /* 优雅 Toast 轻提示 */
+    .toast-msg {
+      position: fixed;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(45, 41, 38, 0.92);
+      color: #f7f5f0;
+      padding: 12px 22px;
+      border-radius: 25px;
+      font-size: 13px;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      backdrop-filter: blur(4px);
+      text-align: center;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+    .toast-msg.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
     /* 弹窗通用样式 */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(30,25,20,0.65); display: none; justify-content: center; align-items: flex-end; z-index: 1001; }
     .modal-overlay.active { display: flex; }
@@ -89,6 +115,9 @@
     <span class="cart-badge" id="cartBadge">0</span>
   </div>
 
+  <!-- Toast轻提示组件 -->
+  <div id="toast" class="toast-msg"></div>
+
   <!-- 购物车弹窗 -->
   <div class="modal-overlay" id="cartModal">
     <div class="modal-content">
@@ -117,13 +146,26 @@
   </div>
 
   <script>
-    const WECHAT_ID = "-Oo1998oO-"; // 替换为你的真实微信号
-    const QR_CODE_URL = "./wechat.png"; // 二维码图片相对路径
+    const WECHAT_ID = "-Oo1998oO-"; 
+    const QR_CODE_URL = "./wechat.png"; 
 
     let allGoods = [];
     let currentCategory = '全部';
     let cardSelectedOptions = {}; 
     let cart = [];
+    let toastTimer = null;
+
+    // Toast 轻提示组件
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1500);
+    }
 
     fetch('goods.json')
       .then(res => res.json())
@@ -248,7 +290,8 @@
       renderGoods();
     }
 
-    function addCardToCart(goodId) {
+    // 支持 isSilent 选项，决定是否跳出飘字提示
+    function addCardToCart(goodId, isSilent = false) {
       const good = allGoods.find(g => g.id === goodId);
       const selectedSpecs = cardSelectedOptions[goodId] || {};
       const specText = Object.keys(selectedSpecs).length > 0 
@@ -264,12 +307,14 @@
       }
 
       updateCartBadge();
-      alert(`已添加：${good.title} (${specText})`);
+      if (!isSilent) {
+        showToast(`已添加：${good.title}`);
+      }
     }
 
     function buyCardNow(goodId) {
-      addCardToCart(goodId);
-      openCartModal();
+      addCardToCart(goodId, true); // 静默加入清单
+      openCartModal(); // 直接展开清单列表
     }
 
     function updateCartBadge() {
@@ -332,7 +377,10 @@
     }
 
     function submitCartOrder() {
-      if (cart.length === 0) return;
+      if (cart.length === 0) {
+        showToast('清单为空，请先选择商品');
+        return;
+      }
 
       let orderText = `【The Here Store 选购清单】\n------------------\n`;
       let total = 0;
@@ -349,7 +397,13 @@
         document.getElementById('wechatIdText').innerText = WECHAT_ID;
         document.getElementById('ownerQr').src = QR_CODE_URL;
         document.getElementById('qrModal').classList.add('active');
-      }).catch(() => alert('订单已生成，请直接截屏发送给店主。'));
+        showToast('订单已复制到剪贴板！');
+      }).catch(() => {
+        closeModal('cartModal');
+        document.getElementById('wechatIdText').innerText = WECHAT_ID;
+        document.getElementById('ownerQr').src = QR_CODE_URL;
+        document.getElementById('qrModal').classList.add('active');
+      });
     }
   </script>
 </body>
